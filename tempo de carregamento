@@ -1,0 +1,12 @@
+cy.visit('/minha-pagina', {
+  onBeforeLoad: (contentWindow) => {
+    contentWindow.performance.mark('inicio');
+  },
+  onLoad: (contentWindow) => {
+    contentWindow.performance.mark('fim');
+    contentWindow.performance.measure('carregamentoDaPagina', 'inicio', 'fim');
+  }
+}).then((win) => {
+  const tempoDeCarregamento = win.performance.getEntriesByName('carregamentoDaPagina')[0].duration;
+  console.log(`Tempo de Carregamento: ${tempoDeCarregamento}`);
+});
