@@ -1,0 +1,6 @@
+cy.intercept('GET', '/minhas-imagens/*', (req) => {
+  req.on('before:response', (res) => {
+    // Simula uma conexão lenta
+    res.setThrottle(100); // Velocidade em Kbps
+  });
+});
