@@ -1,0 +1,27 @@
+
+Este teste envia uma consulta GraphQL para obter os detalhes de um usuário e verifica se a resposta está correta.
+
+describe('Testes de API GraphQL', () => {
+      it('Deve retornar os detalhes do usuário', () => {
+        cy.request({
+          method: 'POST',
+          url: '/',
+          body: {
+            query: `
+              {
+                user(id: "1") {
+                  id
+                  name
+                  email
+                }
+              }
+            `
+          }
+        }).then((response) => {
+          expect(response.status).to.eq(200)
+          expect(response.body.data.user).to.have.property('id')
+          expect(response.body.data.user).to.have.property('name')
+          expect(response.body.data.user).to.have.property('email')
+        })
+      })
+    })
