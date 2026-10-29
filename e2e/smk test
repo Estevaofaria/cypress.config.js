@@ -1,0 +1,36 @@
+User simulation, keep in mind: the Smoke Test is Fast: If your smoke test takes longer than two or three minutes, it ceases to be a smoke test. It must serve as a rapid "green light" signal. 
+Integrate into CI/CD: The smoke test should serve as the first gate of the pipeline. Should it fail, the build must not proceed to regression testing or to production.
+Smoke tests must be deterministic. Use cy.intercept() to await network requests or state assertions (such as should('be.visible')); never rely on fixed waits.
+
+import LoginPage from "../support/pages/LoginPage";
+
+describe("Smoke Test - Fluxos Críticos", () => {
+  // Define um tempo limite menor para garantir que o smoke seja rápido
+  // Se demorar mais que isso, algo está errado.
+  Cypress.config('defaultCommandTimeout', 10000);
+
+  it("deve carregar a página inicial e realizar o login com sucesso", () => {
+    // 1. Verifica se a aplicação está "viva" (não deu erro 500, por exemplo)
+    cy.visit("/");
+    cy.contains("Bem-vindo").should("be.visible"); // ou o título da home
+
+    // 2. Navega para o login
+    cy.get('[data-testid="link-login"]').click();
+
+    // 3. Executa o fluxo crítico de autenticação
+    // (Reutilizando o Page Object que criamos anteriormente)
+    LoginPage.realizarLogin("qa.teste@exemplo.com", "Senha@123");
+
+    // 4. Valida o resultado essencial: o usuário entrou no sistema?
+    // Não valida se a mensagem é bonita ou se o token é X, apenas se funciona.
+    cy.url().should("include", "/dashboard");
+    cy.get('[data-testid="nome-usuario"]').should("be.visible");
+  });
+
+  it("deve carregar a página de login sem erros críticos", () => {
+    // Um smoke test também pode ser apenas verificar se as páginas principais sobem
+    cy.visit("/login");
+    cy.get('[data-testid="input-email"]').should("be.visible");
+    cy.get('[data-testid="btn-login"]').should("be.visible");
+  });
+});
